@@ -1,0 +1,44 @@
+services:
+  backend:
+    build: ./backend
+    container_name: fastapi_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - users_db
+      - books_db
+    environment:
+      - USERS_DB_URL=postgresql://paula:1234@users_db:5432/users_db
+      - BOOKS_DB_URL=postgresql://paula:1234@books_db:5432/books_db
+
+  frontend:
+    build: ./frontend
+    container_name: angular_frontend
+    ports:
+      - "4200:80"
+  users_db:
+    image: postgres:15
+    container_name: users_db
+    environment:
+      POSTGRES_USER: paula
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: users_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - users_data:/var/lib/postgresql/data
+  books_db:
+    image: postgres:15
+    container_name: books_db
+    environment:
+      POSTGRES_USER: paula
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: books_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - books_data:/var/lib/postgresql/data
+
+volumes:
+  users_data:
+  books_data:
