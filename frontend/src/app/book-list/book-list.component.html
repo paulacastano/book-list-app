@@ -1,0 +1,9 @@
+<h2>📚 Lista de Libros</h2>
+
+<div class="card-container">
+  <div class="card" *ngFor="let book of books">
+    <h3>{{ book.title }}</h3>
+    <p><strong>Autor:</strong> {{ book.author }}</p>
+    <p *ngIf="book.year"><strong>Año:</strong> {{ book.year }}</p>
+  </div>
+</div>

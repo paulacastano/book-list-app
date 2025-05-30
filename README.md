@@ -5,7 +5,7 @@
 - node v20.18
 - python 3.10.11
 
-## PARA EJECUTAR EL PROYECTO
+## PARA CONSTRUIR LOS CONTENEDORES
 
 ```
 docker-compose up --build

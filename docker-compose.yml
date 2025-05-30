@@ -38,7 +38,6 @@ services:
       - "5434:5432"
     volumes:
       - books_data:/var/lib/postgresql/data
-
 volumes:
   users_data:
   books_data:

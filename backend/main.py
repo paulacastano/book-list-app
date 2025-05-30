@@ -1,14 +1,87 @@
-from typing import Union
-from fastapi import FastAPI
+from typing import Annotated
+import os
+from fastapi import Depends, FastAPI, HTTPException, Query
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+from fastapi.middleware.cors import CORSMiddleware
+
+
+class Book(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str = Field(index=True)
+    author: str = Field(index=True)
+    description: str
+    year: int
+
+database_url = os.getenv("BOOKS_DB_URL")
+
+engine = create_engine(database_url)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+# Configurar CORS
+origins = [
+    "http://localhost:4200",  # frontend local
+    # Puedes añadir más orígenes si necesitas
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # permite sólo estos orígenes
+    allow_credentials=True,
+    allow_methods=["*"],              # permite todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],              # permite todos los headers
+)
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
+
+@app.post("/books/")
+def create_book(book: Book, session: SessionDep) -> Book:
+    session.add(book)
+    session.commit()
+    session.refresh(book)
+    return book
+
+
+@app.get("/books/")
+def read_books(
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
+) -> list[Book]:
+    books = session.exec(select(Book).offset(offset).limit(limit)).all()
+    return books
+
+
+@app.get("/books/{book_id}")
+def read_book(book_id: int, session: SessionDep) -> Book:
+    book = session.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+
+
+@app.delete("/books/{book_id}")
+def delete_book(book_id: int, session: SessionDep):
+    book = session.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    session.delete(book)
+    session.commit()
+    return {"ok": True}
