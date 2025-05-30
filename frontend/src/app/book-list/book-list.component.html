@@ -1,0 +1,22 @@
+<div class="grid grid-cols-6 gap-4 mx-4">
+  <ng-container *ngFor="let book of books; let i = index">
+    <div
+      class="flex-col w-full aspect-square rounded-lg flex items-center justify-center bg-white hover:-translate-y-1"
+    >
+      <!-- Simulación de imagen -->
+      <div class="h-1/4 flex flex-col w-full px-4 text-center py-2">
+        <h3 class="font-bold">{{ book.title }}</h3>
+        <span class="text-sm text-gray-500"
+          >{{ book.author }} | {{ book.year }}</span
+        >
+      </div>
+      <img
+        src="https://dummyimage.com/100x150/0e2f7d/fff&text={{ book.title }}"
+        alt="{{ book.author }}"
+      />
+      <div class="text-align-right w-full h-1/4 m-2 px-4">
+        <p>{{ book.description | truncate : 100 }}</p>
+      </div>
+    </div>
+  </ng-container>
+</div>
