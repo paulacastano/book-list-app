@@ -7,7 +7,23 @@ export interface Book {
   title: string;
   author: string;
   description: string;
-  image_url: string;
+  image_url?: string;
+  year?: number;
+}
+
+export interface CreateBook {
+  title: string;
+  author: string;
+  description?: string;
+  image_url?: string;
+  year?: number;
+}
+
+export interface EditBook {
+  id: number;
+  title: string;
+  author: string;
+  description?: string;
   year?: number;
 }
 
@@ -21,5 +37,21 @@ export class BooksService {
 
   getBooks(): Observable<Book[]> {
     return this.http.get<Book[]>(this.apiUrl);
+  }
+
+  createBook(book: CreateBook): Observable<Book> {
+    return this.http.post<Book>(this.apiUrl, book);
+  }
+
+  deleteBook(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  editBook(id: number, book: EditBook): Observable<Book> {
+    return this.http.put<Book>(`${this.apiUrl}/${id}`, book);
+  }
+
+  getBookById(id: number): Observable<Book> {
+    return this.http.get<Book>(`${this.apiUrl}/${id}`);
   }
 }

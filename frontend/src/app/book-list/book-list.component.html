@@ -1,10 +1,43 @@
-<div class="grid grid-cols-6 gap-4 mx-4">
+<div class="grid grid-cols-6 gap-4 m-4">
   <ng-container *ngFor="let book of books; let i = index">
     <div
       class="flex-col w-full aspect-square rounded-lg flex items-center justify-center bg-white hover:-translate-y-1"
     >
-      <!-- Simulación de imagen -->
-      <div class="h-1/4 flex flex-col w-full px-4 text-center py-2">
+      <div class="w-full flex justify-end">
+        <!-- Botón de tres puntos -->
+        <button
+          (click)="toggleMenu(i)"
+          class="m-1 text-gray-500 hover:text-gray-800 focus:outline-none"
+        >
+          ⚙️
+        </button>
+
+        <!-- Menú desplegable -->
+        <div
+          *ngIf="activeMenu === i"
+          class="absolute right-0 mt-2 w-35 bg-white border rounded shadow z-10"
+        >
+          <button
+            class="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+            (click)="editBook(i)"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm text-red-600"
+            (click)="deleteBook(i)"
+          >
+            🗑️ Eliminar
+          </button>
+          <button
+            class="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+            (click)="toggleMenu(i)"
+          >
+            ❎ Cancelar
+          </button>
+        </div>
+      </div>
+      <div class="h-2/4 flex flex-col w-full px-4 text-center py-2">
         <h3 class="font-bold">{{ book.title }}</h3>
         <span class="text-sm text-gray-500"
           >{{ book.author }} | {{ book.year }}</span
@@ -14,9 +47,84 @@
         src="https://dummyimage.com/100x150/0e2f7d/fff&text={{ book.title }}"
         alt="{{ book.author }}"
       />
-      <div class="text-align-right w-full h-1/4 m-2 px-4">
-        <p>{{ book.description | truncate : 100 }}</p>
+      <div class="text-align-right w-full h-2/4 m-2 px-4">
+        <p>{{ book.description | truncate : 40 }}</p>
       </div>
     </div>
   </ng-container>
+</div>
+<div
+  *ngIf="showEditModal"
+  class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+>
+  <div class="bg-white p-6 w-full max-w-md shadow-lg relative rounded-md">
+    <h2 class="text-lg font-semibold mb-4">Nuevo libro</h2>
+
+    <form (ngSubmit)="submitEditForm()">
+      <div class="mb-3">
+        <label class="block text-sm font-medium">Título</label>
+        <input
+          type="text"
+          [(ngModel)]="bookToEdit.title"
+          placeholder="Título del libro"
+          name="title"
+          required
+          class="w-full border px-3 py-1 rounded mt-1"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="block text-sm font-medium">Autor</label>
+        <input
+          type="text"
+          [(ngModel)]="bookToEdit.author"
+          placeholder="Autor del libro"
+          name="author"
+          required
+          class="w-full border px-3 py-1 rounded mt-1"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="block text-sm font-medium">Descripción</label>
+        <textarea
+          [(ngModel)]="bookToEdit.description"
+          placeholder="Descripción del libro"
+          name="description"
+          required
+          rows="3"
+          class="w-full border px-3 py-1 rounded mt-1"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium">Año</label>
+        <input
+          type="number"
+          [min]="1900"
+          [max]="currentYear"
+          placeholder="Año de publicación"
+          [(ngModel)]="bookToEdit.year"
+          name="year"
+          class="w-full border px-3 py-1 rounded mt-1"
+        />
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeEditModal()"
+          class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Crear
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
