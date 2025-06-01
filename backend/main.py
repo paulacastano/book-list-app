@@ -1,5 +1,7 @@
 from typing import Annotated
 import os
+from users import create_users_db_and_tables, router
+from pydantic import BaseModel
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,7 +20,7 @@ engine = create_engine(database_url)
 
 
 def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(engine, tables=[SQLModel.metadata.tables["book"]])
 
 
 def get_session():
@@ -49,6 +51,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+    create_users_db_and_tables()
 
 
 @app.post("/books/")
@@ -96,3 +99,5 @@ def delete_book(book_id: int, session: SessionDep):
     session.delete(book)
     session.commit()
     return {"ok": True}
+
+app.include_router(router, prefix="/users", tags=["users"])

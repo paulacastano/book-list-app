@@ -1,11 +1,19 @@
 <div class="flex items-center justify-between mb-6 p-4 bg-white">
   <h1 class="text-xl font-semibold">📚 Lista de Libros</h1>
-  <button
-    class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
-    (click)="openModal()"
-  >
-    crear
-  </button>
+  <div class="flex space-x-2">
+    <button
+      class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+      (click)="openModal()"
+    >
+      crear libro
+    </button>
+    <button
+      class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+      (click)="logout()"
+    >
+      logout
+    </button>
+  </div>
 </div>
 <app-create-book-modal [visible]="showModal" (close)="closeModal()">
 </app-create-book-modal>
