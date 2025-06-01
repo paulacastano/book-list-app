@@ -58,6 +58,17 @@ def create_book(book: Book, session: SessionDep) -> Book:
     session.refresh(book)
     return book
 
+@app.put("/books/{book_id}")
+def update_book(book_id: int, book: Book, session: SessionDep) -> Book:
+    existing_book = session.get(Book, book_id)
+    if not existing_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    book.id = book_id
+    session.merge(book)
+    session.commit()
+    return book
+
 
 @app.get("/books/")
 def read_books(
